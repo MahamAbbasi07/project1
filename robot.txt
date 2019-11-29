@@ -1,0 +1,146 @@
+
+            /*   ** ######   Obstacle Detector 2 Wheel Moving robot ###### **   */
+
+int trigPinL=8, echoPinL=9; // Declaration of Trigger and Echo Points of Left Ultrasonic Sensor
+int trigPinC=13, echoPinC=12; // Declaration of Trigger and Echo Points of Centre Ultrasonic Sensor
+int trigPinR=3, echoPinR=2; // Declaration of Trigger and Echo Points of Right Ultrasonic Sensor
+int RS1=4, RS2=5, RSSpeed=11;       // Declaration of Points of Right Side Motor
+int LS1=6, LS2=7, LSSpeed=10;       // Decalaration of Points of Left Side Motor
+float cmL,cmC, cmR, durationC, durationL, durationR;
+
+void setup() {
+  pinMode(trigPinL,OUTPUT);
+  pinMode(echoPinL,INPUT);
+  pinMode(trigPinR,OUTPUT);
+  pinMode(echoPinR,INPUT);
+  pinMode(trigPinC,OUTPUT);
+  pinMode(echoPinC,INPUT);
+  pinMode(RS1,OUTPUT);
+  pinMode(RS2,OUTPUT);
+  pinMode(LS1,OUTPUT);
+  pinMode(LS2,OUTPUT);
+  pinMode(LSSpeed,OUTPUT);
+  pinMode(RSSpeed,OUTPUT);
+ 
+  Serial.begin(9600);
+  moveStop();
+  delay(1500);
+}
+
+void loop() {
+
+  digitalWrite(trigPinL,LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPinL,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinL,LOW);
+  durationL= pulseIn(echoPinL,HIGH);
+  cmL= (durationL/2)/29.1;
+  
+  digitalWrite(trigPinR,LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPinR,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinR,LOW);
+  durationR= pulseIn(echoPinR,HIGH);
+  cmR= (durationR/2)/29.1;
+  
+  digitalWrite(trigPinC,LOW);
+  delayMicroseconds(5);
+  digitalWrite(trigPinC,HIGH);
+  delayMicroseconds(10);
+  digitalWrite(trigPinC,LOW);
+  durationC= pulseIn(echoPinC,HIGH);
+  cmC= (durationC/2)/29.1;
+  
+  Serial.println(cmC);
+  Serial.println(cmL);
+  Serial.println(cmR);
+
+  if(cmC >= 35)
+  {
+    if(cmR >= 35 && cmL >=35)
+    {
+      moveForward();
+    }
+    if(cmR >=35 && cmL <=35)
+    {
+      moveRight();
+      delay(300);
+    }
+    if(cmR <=35 && cmL >=35)
+    {
+      moveLeft();
+      delay(300);
+    }
+    
+    
+  }
+
+    else if(cmC < 35)
+    {
+      
+      if(cmR >=35 && cmL <=35)
+      {
+        moveRight();
+      }
+      if(cmR <=35 && cmL >=35)
+      {
+        moveLeft();
+      }
+      if(cmR <=35 && cmL <=35)
+      {
+        moveBackward();
+        delay(1000);
+        moveLeft();
+        delay(1050);
+      }
+    }
+
+
+
+}
+
+void moveBackward() {
+  Serial.println("Backward.");
+  digitalWrite(LS1, HIGH);
+  digitalWrite(LS2, LOW);
+  digitalWrite(RS1, HIGH);
+  digitalWrite(RS2, LOW);
+  analogWrite(LSSpeed,255);
+  analogWrite(RSSpeed,255);
+}
+void moveForward() {
+  Serial.println("Forward.");
+  digitalWrite(LS1, LOW);
+  digitalWrite(LS2, HIGH);
+  digitalWrite(RS1, LOW);
+  digitalWrite(RS2, HIGH);
+  analogWrite(LSSpeed,255);
+  analogWrite(RSSpeed,255);
+}
+void moveLeft() {
+  Serial.println("Left.");
+  digitalWrite(LS1, LOW);
+  digitalWrite(LS2, HIGH);
+  digitalWrite(RS1, HIGH);
+  digitalWrite(RS2, LOW);
+  analogWrite(LSSpeed,175);
+  analogWrite(RSSpeed,175);
+}
+void moveRight() {
+  Serial.println("Right.");
+  digitalWrite(LS1, HIGH);
+  digitalWrite(LS2, LOW);
+  digitalWrite(RS1, LOW);
+  digitalWrite(RS2, HIGH);
+  analogWrite(LSSpeed,175);
+  analogWrite(RSSpeed,175);
+}
+void moveStop()
+{
+  digitalWrite(LS1, LOW);
+  digitalWrite(LS2, LOW);
+  digitalWrite(RS1, LOW);
+  digitalWrite(RS2, LOW);
+}
